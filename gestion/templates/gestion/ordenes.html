@@ -1,0 +1,27 @@
+{% extends 'gestion/base.html' %}
+
+{% block content %}
+<h2>Órdenes</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Empleado</th>
+        <th>Mesa</th>
+        <th>Fecha</th>
+        <th>Estado</th>
+        <th>Total</th>
+    </tr>
+    {% for orden in ordenes %}
+    <tr>
+        <td>{{ orden.id }}</td>
+        <td>{{ orden.cliente.nombre }}</td>
+        <td>{{ orden.empleado.nombre }}</td>
+        <td>{{ orden.mesa.numero_mesa }}</td>
+        <td>{{ orden.fecha_hora }}</td>
+        <td>{{ orden.estado_orden }}</td>
+        <td>{{ orden.total }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

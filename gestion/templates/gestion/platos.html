@@ -1,0 +1,25 @@
+{% extends 'gestion/base.html' %}
+
+{% block content %}
+<h2>Platos</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Categoría</th>
+        <th>Disponible</th>
+    </tr>
+    {% for plato in platos %}
+    <tr>
+        <td>{{ plato.id }}</td>
+        <td>{{ plato.nombre_plato }}</td>
+        <td>{{ plato.descripcion }}</td>
+        <td>{{ plato.precio }}</td>
+        <td>{{ plato.categoria }}</td>
+        <td>{{ plato.disponible }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'gestion/base.html' %}
+
+{% block content %}
+<h2>Facturas</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Orden</th>
+        <th>Fecha</th>
+        <th>Subtotal</th>
+        <th>Impuesto</th>
+        <th>Total</th>
+        <th>Método de pago</th>
+    </tr>
+    {% for factura in facturas %}
+    <tr>
+        <td>{{ factura.id }}</td>
+        <td>{{ factura.orden.id }}</td>
+        <td>{{ factura.fecha_factura }}</td>
+        <td>{{ factura.subtotal }}</td>
+        <td>{{ factura.impuesto }}</td>
+        <td>{{ factura.total_factura }}</td>
+        <td>{{ factura.metodo_pago }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

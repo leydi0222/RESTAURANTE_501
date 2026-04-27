@@ -1,0 +1,21 @@
+{% extends 'gestion/base.html' %}
+
+{% block content %}
+<h2>Clientes</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Correo</th>
+    </tr>
+    {% for cliente in clientes %}
+    <tr>
+        <td>{{ cliente.id }}</td>
+        <td>{{ cliente.nombre }}</td>
+        <td>{{ cliente.telefono }}</td>
+        <td>{{ cliente.correo }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

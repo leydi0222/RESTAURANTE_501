@@ -1,0 +1,21 @@
+{% extends 'gestion/base.html' %}
+
+{% block content %}
+<h2>Mesas</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Número</th>
+        <th>Capacidad</th>
+        <th>Estado</th>
+    </tr>
+    {% for mesa in mesas %}
+    <tr>
+        <td>{{ mesa.id }}</td>
+        <td>{{ mesa.numero_mesa }}</td>
+        <td>{{ mesa.capacidad }}</td>
+        <td>{{ mesa.estado_mesa }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

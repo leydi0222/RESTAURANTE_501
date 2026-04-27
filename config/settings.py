@@ -78,7 +78,7 @@ DATABASES= {
     'ENGINE': 'mssql',
     'NAME': 'restaurante_501',
     'USER': 'sa',
-    'PASSWORD': '12345678',
+    'PASSWORD': '123',
     'HOST': r'localhost\SQLEXPRESS',
     'PORT':'1433',
     'OPTIONS': {

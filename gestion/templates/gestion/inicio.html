@@ -1,0 +1,35 @@
+{% extends 'gestion/base.html' %}
+
+{% block content %}
+<h2>Panel principal</h2>
+
+<div class="card">
+    <h3>Clientes</h3>
+    <p>{{ total_clientes }}</p>
+</div>
+
+<div class="card">
+    <h3>Empleados</h3>
+    <p>{{ total_empleados }}</p>
+</div>
+
+<div class="card">
+    <h3>Mesas</h3>
+    <p>{{ total_mesas }}</p>
+</div>
+
+<div class="card">
+    <h3>Platos</h3>
+    <p>{{ total_platos }}</p>
+</div>
+
+<div class="card">
+    <h3>Órdenes</h3>
+    <p>{{ total_ordenes }}</p>
+</div>
+
+<div class="card">
+    <h3>Facturas</h3>
+    <p>{{ total_facturas }}</p>
+</div>
+{% endblock %}

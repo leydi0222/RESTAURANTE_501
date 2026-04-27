@@ -1,0 +1,23 @@
+{% extends 'gestion/base.html' %}
+
+{% block content %}
+<h2>Empleados</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Cargo</th>
+        <th>Teléfono</th>
+        <th>Correo</th>
+    </tr>
+    {% for empleado in empleados %}
+    <tr>
+        <td>{{ empleado.id }}</td>
+        <td>{{ empleado.nombre }}</td>
+        <td>{{ empleado.cargo }}</td>
+        <td>{{ empleado.telefono }}</td>
+        <td>{{ empleado.correo }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
