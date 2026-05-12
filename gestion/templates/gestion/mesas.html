@@ -1,21 +1,73 @@
 {% extends 'gestion/base.html' %}
 
 {% block content %}
-<h2>Mesas</h2>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Número</th>
-        <th>Capacidad</th>
-        <th>Estado</th>
-    </tr>
-    {% for mesa in mesas %}
-    <tr>
-        <td>{{ mesa.id }}</td>
-        <td>{{ mesa.numero_mesa }}</td>
-        <td>{{ mesa.capacidad }}</td>
-        <td>{{ mesa.estado_mesa }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<!-- Header de la página -->
+<div class="page-header">
+    <div class="container-fluid">
+        <h1><i class="fas fa-table"></i> Gestión de Mesas</h1>
+        <p>Administra las mesas disponibles en tu restaurante</p>
+    </div>
+</div>
+
+<!-- Tabla de mesas -->
+<div class="row">
+    <div class="col-12">
+        {% if mesas %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-hashtag"></i> ID</th>
+                    <th><i class="fas fa-chair"></i> Número de Mesa</th>
+                    <th><i class="fas fa-users"></i> Capacidad</th>
+                    <th><i class="fas fa-circle"></i> Estado</th>
+                    <th><i class="fas fa-cog"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mesa in mesas %}
+                <tr>
+                    <td><span class="badge bg-warning">{{ mesa.id }}</span></td>
+                    <td><strong>Mesa {{ mesa.numero_mesa }}</strong></td>
+                    <td>{{ mesa.capacidad }} personas</td>
+                    <td>
+                        {% if mesa.estado_mesa == 'Disponible' %}
+                            <span class="badge bg-success">Disponible</span>
+                        {% elif mesa.estado_mesa == 'Ocupada' %}
+                            <span class="badge bg-danger">Ocupada</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ mesa.estado_mesa }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-info" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="#" class="btn btn-sm btn-warning" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="#" class="btn btn-sm btn-danger" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No hay mesas registradas aún</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Botón para agregar nueva mesa -->
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="#" class="btn btn-success btn-lg">
+            <i class="fas fa-plus"></i> Nueva Mesa
+        </a>
+    </div>
+</div>
 {% endblock %}

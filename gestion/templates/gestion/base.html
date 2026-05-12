@@ -1,85 +1,79 @@
+{% load static %}/*rutas para archivos estaticos*/
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurante Pasta La Vista</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #8B0000;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-        nav {
-            background-color: #b22222;
-            padding: 10px;
-            text-align: center;
-        }
-        nav a {
-            color: white;
-            margin: 0 12px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .contenedor {
-            width: 90%;
-            margin: 20px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #eee;
-        }
-        .card {
-            display: inline-block;
-            width: 200px;
-            background: #fafafa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px;
-            text-align: center;
-        }
-    </style>
+    
+    <!-- Bootstrap 5 CSS: libreria que proporciona estilos predefinidos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    /*font-awesome:libreria de iconos */
+
+    /*usar archivos estaticos para estilos personalizados*/
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> /*static...:decirle al servidor dónde están guardados esos archivos.
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}"> /*navbarcss: estilos para la barra de navegación*/
+    <link rel="stylesheet" href="{% static 'css/cards.css' %}">/*cards.css: estilos de tarjetas estadisticas*/
+    <link rel="stylesheet" href="{% static 'css/tables.css' %}">/*tables.css:estilos de tablas*/
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">/*foote.css: estilos de pie de pagina*/
 </head>
 <body>
-    <header>
-        <h1>Sistema de Gestión de Pedidos - Pasta La Vista</h1>
-    </header>
-
-    <nav>
-        <a href="/">Inicio</a>
-        <a href="/clientes/">Clientes</a>
-        <a href="/empleados/">Empleados</a>
-        <a href="/mesas/">Mesas</a>
-        <a href="/platos/">Platos</a>
-        <a href="/ordenes/">Órdenes</a>
-        <a href="/facturas/">Facturas</a>
-        <a href="/admin/">Admin</a>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">/*navbar-expand-ig: adaptarse al tamaño de pantalla, stickip-top:quedarse fija en la parte superior de la pantalla*/
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-utensils"></i>
+                Pasta La Vista
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clientes/"><i class="fas fa-users"></i> Clientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/empleados/"><i class="fas fa-id-badge"></i> Empleados</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mesas/"><i class="fas fa-table"></i> Mesas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/platos/"><i class="fas fa-bowl-food"></i> Platos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ordenes/"><i class="fas fa-list"></i> Órdenes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas/"><i class="fas fa-receipt"></i> Facturas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/"><i class="fas fa-cog"></i> Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </nav>
 
+    <!-- Contenedor principal -->
     <div class="contenedor">
         {% block content %}
         {% endblock %}
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Sistema de Gestión de Restaurante Pasta La Vista. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,23 +1,69 @@
 {% extends 'gestion/base.html' %}
 
 {% block content %}
-<h2>Empleados</h2>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Cargo</th>
-        <th>Teléfono</th>
-        <th>Correo</th>
-    </tr>
-    {% for empleado in empleados %}
-    <tr>
-        <td>{{ empleado.id }}</td>
-        <td>{{ empleado.nombre }}</td>
-        <td>{{ empleado.cargo }}</td>
-        <td>{{ empleado.telefono }}</td>
-        <td>{{ empleado.correo }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<!-- Header de la página -->
+<div class="page-header">
+    <div class="container-fluid">
+        <h1><i class="fas fa-id-badge"></i> Gestión de Empleados</h1>
+        <p>Administra el personal de tu restaurante</p>
+    </div>
+</div>
+
+<!-- Tabla de empleados -->
+<div class="row">
+    <div class="col-12">
+        {% if empleados %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-hashtag"></i> ID</th>
+                    <th><i class="fas fa-user"></i> Nombre</th>
+                    <th><i class="fas fa-briefcase"></i> Cargo</th>
+                    <th><i class="fas fa-phone"></i> Teléfono</th>
+                    <th><i class="fas fa-envelope"></i> Correo</th>
+                    <th><i class="fas fa-cog"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empleado in empleados %}
+                <tr>
+                    <td><span class="badge bg-success">{{ empleado.id }}</span></td>
+                    <td><strong>{{ empleado.nombre }}</strong></td>
+                    <td>
+                        <span class="badge bg-info">{{ empleado.cargo }}</span>
+                    </td>
+                    <td>{{ empleado.telefono }}</td>
+                    <td>{{ empleado.correo }}</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-info" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="#" class="btn btn-sm btn-warning" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="#" class="btn btn-sm btn-danger" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No hay empleados registrados aún</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Botón para agregar nuevo empleado -->
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="#" class="btn btn-success btn-lg">
+            <i class="fas fa-plus"></i> Nuevo Empleado
+        </a>
+    </div>
+</div>
 {% endblock %}

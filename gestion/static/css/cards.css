@@ -1,0 +1,86 @@
+/* ESTILOS DE CARDS - cards.css: TARJETAS ESTADISTICAS DE DASHBOARD*/
+
+
+.card-estadistica {
+    background: white;
+    border: none;
+    border-radius: 12px;/*sombras suaves*/
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+    overflow: hidden;
+}
+
+.card-estadistica:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.card-estadistica .card-body {
+    padding: 25px;
+    text-align: center;
+}
+
+.card-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Gradientes de colores para cada card */
+.card-icon-clientes { 
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    color: white; 
+}
+
+.card-icon-empleados { 
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+    color: white; 
+}
+
+.card-icon-mesas { 
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+    color: white; 
+}
+
+.card-icon-platos { 
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); 
+    color: white; 
+}
+
+.card-icon-ordenes { 
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); 
+    color: white; 
+}
+
+.card-icon-facturas { 
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); 
+    color: white; 
+}
+
+.card-estadistica h3 {
+    color: #333;
+    font-weight: 600;
+    margin: 15px 0;
+    font-size: 1.1rem;
+}
+
+.card-estadistica .numero-grande {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+/* Responsive adaptable a celulares */
+@media (max-width: 768px) {
+    .card-estadistica .card-body {
+        padding: 15px;
+    }
+}

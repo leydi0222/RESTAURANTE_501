@@ -1,35 +1,132 @@
 {% extends 'gestion/base.html' %}
 
 {% block content %}
-<h2>Panel principal</h2>
-
-<div class="card">
-    <h3>Clientes</h3>
-    <p>{{ total_clientes }}</p>
+<!-- Header del Dashboard -->
+<div class="page-header">
+    <div class="container-fluid">
+        <h1><i class="fas fa-tachometer-alt"></i> Panel Principal</h1>
+        <p>Bienvenido al Sistema de Gestión del Restaurante Pasta La Vista</p>
+    </div>
 </div>
 
-<div class="card">
-    <h3>Empleados</h3>
-    <p>{{ total_empleados }}</p>
+/*uso de cards para mortrar estadisticas del restaurante de manera visual y atractiva*/
+<!-- Estadísticas principales -->
+<div class="row">
+    <!-- Card Clientes -->
+    <div class="col-lg-4 col-md-6">
+        <div class="card card-estadistica">
+            <div class="card-body">
+                <div class="card-icon card-icon-clientes">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Clientes</h3>
+                <p class="numero-grande">{{ total_clientes }}</p>
+                <small class="text-muted">Clientes registrados</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Empleados -->
+    <div class="col-lg-4 col-md-6">
+        <div class="card card-estadistica">
+            <div class="card-body">
+                <div class="card-icon card-icon-empleados">
+                    <i class="fas fa-id-badge"></i>
+                </div>
+                <h3>Empleados</h3>
+                <p class="numero-grande">{{ total_empleados }}</p>
+                <small class="text-muted">Personal activo</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Mesas -->
+    <div class="col-lg-4 col-md-6">
+        <div class="card card-estadistica">
+            <div class="card-body">
+                <div class="card-icon card-icon-mesas">
+                    <i class="fas fa-table"></i>
+                </div>
+                <h3>Mesas</h3>
+                <p class="numero-grande">{{ total_mesas }}</p>
+                <small class="text-muted">Mesas disponibles</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Platos -->
+    <div class="col-lg-4 col-md-6">
+        <div class="card card-estadistica">
+            <div class="card-body">
+                <div class="card-icon card-icon-platos">
+                    <i class="fas fa-bowl-food"></i>
+                </div>
+                <h3>Platos</h3>
+                <p class="numero-grande">{{ total_platos }}</p>
+                <small class="text-muted">En el menú</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Órdenes -->
+    <div class="col-lg-4 col-md-6">
+        <div class="card card-estadistica">
+            <div class="card-body">
+                <div class="card-icon card-icon-ordenes">
+                    <i class="fas fa-list"></i>
+                </div>
+                <h3>Órdenes</h3>
+                <p class="numero-grande">{{ total_ordenes }}</p>
+                <small class="text-muted">Órdenes procesadas</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Facturas -->
+    <div class="col-lg-4 col-md-6">
+        <div class="card card-estadistica">
+            <div class="card-body">
+                <div class="card-icon card-icon-facturas">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <h3>Facturas</h3>
+                <p class="numero-grande">{{ total_facturas }}</p>
+                <small class="text-muted">Facturas emitidas</small>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="card">
-    <h3>Mesas</h3>
-    <p>{{ total_mesas }}</p>
-</div>
-
-<div class="card">
-    <h3>Platos</h3>
-    <p>{{ total_platos }}</p>
-</div>
-
-<div class="card">
-    <h3>Órdenes</h3>
-    <p>{{ total_ordenes }}</p>
-</div>
-
-<div class="card">
-    <h3>Facturas</h3>
-    <p>{{ total_facturas }}</p>
+<!-- Accesos rápidos -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card card-estadistica">
+            <div class="card-body">
+                <h4 class="mb-4"><i class="fas fa-bolt"></i> Accesos Rápidos</h4>
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 text-center mb-3">
+                        <a href="/clientes/" class="btn btn-outline-primary btn-lg w-100">
+                            <i class="fas fa-users"></i><br>Gestionar Clientes
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 text-center mb-3">
+                        <a href="/empleados/" class="btn btn-outline-danger btn-lg w-100">
+                            <i class="fas fa-id-badge"></i><br>Gestionar Empleados
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 text-center mb-3">
+                        <a href="/ordenes/" class="btn btn-outline-success btn-lg w-100">
+                            <i class="fas fa-list"></i><br>Ver Órdenes
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 text-center mb-3">
+                        <a href="/facturas/" class="btn btn-outline-warning btn-lg w-100">
+                            <i class="fas fa-receipt"></i><br>Ver Facturas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

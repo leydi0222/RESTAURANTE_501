@@ -1,27 +1,83 @@
 {% extends 'gestion/base.html' %}
 
 {% block content %}
-<h2>Órdenes</h2>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Cliente</th>
-        <th>Empleado</th>
-        <th>Mesa</th>
-        <th>Fecha</th>
-        <th>Estado</th>
-        <th>Total</th>
-    </tr>
-    {% for orden in ordenes %}
-    <tr>
-        <td>{{ orden.id }}</td>
-        <td>{{ orden.cliente.nombre }}</td>
-        <td>{{ orden.empleado.nombre }}</td>
-        <td>{{ orden.mesa.numero_mesa }}</td>
-        <td>{{ orden.fecha_hora }}</td>
-        <td>{{ orden.estado_orden }}</td>
-        <td>{{ orden.total }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<!-- Header de la página -->
+<div class="page-header">
+    <div class="container-fluid">
+        <h1><i class="fas fa-list"></i> Gestión de Órdenes</h1>
+        <p>Administra las órdenes de tu restaurante</p>
+    </div>
+</div>
+
+<!-- Tabla de órdenes -->
+<div class="row">
+    <div class="col-12">
+        {% if ordenes %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-hashtag"></i> ID</th>
+                        <th><i class="fas fa-user"></i> Cliente</th>
+                        <th><i class="fas fa-id-badge"></i> Empleado</th>
+                        <th><i class="fas fa-table"></i> Mesa</th>
+                        <th><i class="fas fa-calendar"></i> Fecha</th>
+                        <th><i class="fas fa-circle"></i> Estado</th>
+                        <th><i class="fas fa-dollar-sign"></i> Total</th>
+                        <th><i class="fas fa-cog"></i> Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orden in ordenes %}
+                    <tr>
+                        <td><span class="badge bg-danger">{{ orden.id }}</span></td>
+                        <td><strong>{{ orden.cliente.nombre }}</strong></td>
+                        <td>{{ orden.empleado.nombre }}</td>
+                        <td>
+                            <span class="badge bg-light text-dark">Mesa {{ orden.mesa.numero_mesa }}</span>
+                        </td>
+                        <td>{{ orden.fecha_hora|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if orden.estado_orden == 'Pendiente' %}
+                                <span class="badge bg-warning">Pendiente</span>
+                            {% elif orden.estado_orden == 'Completada' %}
+                                <span class="badge bg-success">Completada</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ orden.estado_orden }}</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>${{ orden.total }}</strong></td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-info" title="Ver detalles">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm btn-warning" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm btn-danger" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No hay órdenes registradas aún</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Botón para agregar nueva orden -->
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="#" class="btn btn-success btn-lg">
+            <i class="fas fa-plus"></i> Nueva Orden
+        </a>
+    </div>
+</div>
 {% endblock %}
