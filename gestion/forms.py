@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django import forms
 from django.contrib.auth.hashers import make_password
 from django.db import connection
@@ -357,6 +358,19 @@ class FacturaForm(forms.ModelForm):
             'impuesto': 'Impuesto',
             'metodo_pago': 'Método de Pago',
         }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        orden = self.cleaned_data.get('orden')
+        impuesto = self.cleaned_data.get('impuesto') or Decimal('0.00')
+
+        if orden is not None:
+            instance.subtotal = orden.total
+            instance.total_factura = orden.total + impuesto
+
+        if commit:
+            instance.save()
+        return instance
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
