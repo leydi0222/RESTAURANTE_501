@@ -1,10 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 # Importar modelos
 from .models import Cliente, Empleado, Mesa, Orden, Factura, Plato, Usuario
-from .forms import LoginForm, RegistroForm
+# Importar formularios
+from .forms import (
+    LoginForm, RegistroForm, ClienteForm, EmpleadoForm,
+    MesaForm, PlatoForm, OrdenForm, FacturaForm
+)
 
 
 # ============ VISTAS DE AUTENTICACIÓN ============
@@ -147,32 +151,317 @@ def inicio(request):
     return render(request, 'gestion/inicio.html', context)
 
 
+# ============ CRUD CLIENTES ============
+
 @requiere_login
 def lista_clientes(request):
-    """Vista de clientes - Solo para usuarios logueados"""
+    """
+    EXPLICACIÓN: Muestra la lista de todos los clientes.
+    
+    QUÉ HACE:
+    - Obtiene todos los clientes de la BD
+    - Los pasa al template para mostrar en una tabla
+    """
     clientes = Cliente.objects.all()
     return render(request, 'gestion/clientes.html', {'clientes': clientes})
 
 
 @requiere_login
+def crear_cliente(request):
+    """
+    EXPLICACIÓN: Vista para crear un nuevo cliente.
+    
+    QUÉ HACE:
+    - GET: Muestra el formulario vacío
+    - POST: Valida y guarda el nuevo cliente
+    """
+    if request.method == 'POST':
+        form = ClienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cliente creado correctamente.")
+            return redirect('lista_clientes')
+    else:
+        form = ClienteForm()
+    
+    return render(request, 'gestion/cliente_form.html', {'form': form, 'titulo': 'Crear Cliente'})
+
+
+@requiere_login
+def editar_cliente(request, pk):
+    """
+    EXPLICACIÓN: Vista para editar un cliente existente.
+    
+    QUÉ HACE:
+    - GET: Muestra el formulario con los datos actuales
+    - POST: Valida y actualiza el cliente
+    """
+    cliente = get_object_or_404(Cliente, pk=pk)
+    
+    if request.method == 'POST':
+        form = ClienteForm(request.POST, instance=cliente)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cliente actualizado correctamente.")
+            return redirect('lista_clientes')
+    else:
+        form = ClienteForm(instance=cliente)
+    
+    return render(request, 'gestion/cliente_form.html', {'form': form, 'titulo': 'Editar Cliente', 'cliente': cliente})
+
+
+@requiere_login
+def eliminar_cliente(request, pk):
+    """
+    EXPLICACIÓN: Vista para eliminar un cliente.
+    
+    QUÉ HACE:
+    - GET: Muestra una página de confirmación
+    - POST: Elimina el cliente
+    """
+    cliente = get_object_or_404(Cliente, pk=pk)
+    
+    if request.method == 'POST':
+        cliente.delete()
+        messages.success(request, "Cliente eliminado correctamente.")
+        return redirect('lista_clientes')
+    
+    return render(request, 'gestion/confirmar_eliminar.html', {'objeto': cliente, 'tipo': 'Cliente'})
+
+
+# ============ CRUD EMPLEADOS ============
+
+@requiere_login
 def lista_empleados(request):
-    """Vista de empleados - Solo para usuarios logueados"""
+    """
+    EXPLICACIÓN: Muestra la lista de todos los empleados.
+    """
     empleados = Empleado.objects.all()
     return render(request, 'gestion/empleados.html', {'empleados': empleados})
 
 
 @requiere_login
+def crear_empleado(request):
+    """
+    EXPLICACIÓN: Vista para crear un nuevo empleado.
+    """
+    if request.method == 'POST':
+        form = EmpleadoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Empleado creado correctamente.")
+            return redirect('lista_empleados')
+    else:
+        form = EmpleadoForm()
+    
+    return render(request, 'gestion/empleado_form.html', {'form': form, 'titulo': 'Crear Empleado'})
+
+
+@requiere_login
+def editar_empleado(request, pk):
+    """
+    EXPLICACIÓN: Vista para editar un empleado existente.
+    """
+    empleado = get_object_or_404(Empleado, pk=pk)
+    
+    if request.method == 'POST':
+        form = EmpleadoForm(request.POST, instance=empleado)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Empleado actualizado correctamente.")
+            return redirect('lista_empleados')
+    else:
+        form = EmpleadoForm(instance=empleado)
+    
+    return render(request, 'gestion/empleado_form.html', {'form': form, 'titulo': 'Editar Empleado', 'empleado': empleado})
+
+
+@requiere_login
+def eliminar_empleado(request, pk):
+    """
+    EXPLICACIÓN: Vista para eliminar un empleado.
+    """
+    empleado = get_object_or_404(Empleado, pk=pk)
+    
+    if request.method == 'POST':
+        empleado.delete()
+        messages.success(request, "Empleado eliminado correctamente.")
+        return redirect('lista_empleados')
+    
+    return render(request, 'gestion/confirmar_eliminar.html', {'objeto': empleado, 'tipo': 'Empleado'})
+
+
+# ============ CRUD MESAS ============
+
+@requiere_login
 def lista_mesas(request):
-    """Vista de mesas - Solo para usuarios logueados"""
+    """
+    EXPLICACIÓN: Muestra la lista de todas las mesas.
+    """
     mesas = Mesa.objects.all()
     return render(request, 'gestion/mesas.html', {'mesas': mesas})
 
+
+@requiere_login
+def crear_mesa(request):
+    """
+    EXPLICACIÓN: Vista para crear una nueva mesa.
+    """
+    if request.method == 'POST':
+        form = MesaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Mesa creada correctamente.")
+            return redirect('lista_mesas')
+    else:
+        form = MesaForm()
+    
+    return render(request, 'gestion/mesa_form.html', {'form': form, 'titulo': 'Crear Mesa'})
+
+
+@requiere_login
+def editar_mesa(request, pk):
+    """
+    EXPLICACIÓN: Vista para editar una mesa existente.
+    """
+    mesa = get_object_or_404(Mesa, pk=pk)
+    
+    if request.method == 'POST':
+        form = MesaForm(request.POST, instance=mesa)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Mesa actualizada correctamente.")
+            return redirect('lista_mesas')
+    else:
+        form = MesaForm(instance=mesa)
+    
+    return render(request, 'gestion/mesa_form.html', {'form': form, 'titulo': 'Editar Mesa', 'mesa': mesa})
+
+
+@requiere_login
+def eliminar_mesa(request, pk):
+    """
+    EXPLICACIÓN: Vista para eliminar una mesa.
+    """
+    mesa = get_object_or_404(Mesa, pk=pk)
+    
+    if request.method == 'POST':
+        mesa.delete()
+        messages.success(request, "Mesa eliminada correctamente.")
+        return redirect('lista_mesas')
+    
+    return render(request, 'gestion/confirmar_eliminar.html', {'objeto': mesa, 'tipo': 'Mesa'})
+
+
+# ============ CRUD PLATOS ============
+
+@requiere_login
+def lista_platos(request):
+    """
+    EXPLICACIÓN: Muestra la lista de todos los platos.
+    """
+    platos = Plato.objects.all()
+    return render(request, 'gestion/platos.html', {'platos': platos})
+
+
+@requiere_login
+def crear_plato(request):
+    """
+    EXPLICACIÓN: Vista para crear un nuevo plato.
+    """
+    if request.method == 'POST':
+        form = PlatoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Plato creado correctamente.")
+            return redirect('lista_platos')
+    else:
+        form = PlatoForm()
+    
+    return render(request, 'gestion/plato_form.html', {'form': form, 'titulo': 'Crear Plato'})
+
+
+@requiere_login
+def editar_plato(request, pk):
+    """
+    EXPLICACIÓN: Vista para editar un plato existente.
+    """
+    plato = get_object_or_404(Plato, pk=pk)
+    
+    if request.method == 'POST':
+        form = PlatoForm(request.POST, instance=plato)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Plato actualizado correctamente.")
+            return redirect('lista_platos')
+    else:
+        form = PlatoForm(instance=plato)
+    
+    return render(request, 'gestion/plato_form.html', {'form': form, 'titulo': 'Editar Plato', 'plato': plato})
+
+
+@requiere_login
+def eliminar_plato(request, pk):
+    """
+    EXPLICACIÓN: Vista para eliminar un plato.
+    """
+    plato = get_object_or_404(Plato, pk=pk)
+    
+    if request.method == 'POST':
+        plato.delete()
+        messages.success(request, "Plato eliminado correctamente.")
+        return redirect('lista_platos')
+    
+    return render(request, 'gestion/confirmar_eliminar.html', {'objeto': plato, 'tipo': 'Plato'})
+
+
+# ============ VISTAS DE SOLO LECTURA (Órdenes y Facturas) ============
 
 @requiere_login
 def lista_ordenes(request):
     """Vista de órdenes - Solo para usuarios logueados"""
     ordenes = Orden.objects.all()
     return render(request, 'gestion/ordenes.html', {'ordenes': ordenes})
+
+
+@requiere_login
+def crear_orden(request):
+    """Vista para crear una nueva orden."""
+    if request.method == 'POST':
+        form = OrdenForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Orden creada correctamente.")
+            return redirect('lista_ordenes')
+    else:
+        form = OrdenForm()
+    return render(request, 'gestion/orden_form.html', {'form': form, 'titulo': 'Crear Orden'})
+
+
+@requiere_login
+def editar_orden(request, pk):
+    """Vista para editar una orden existente."""
+    orden = get_object_or_404(Orden, pk=pk)
+    if request.method == 'POST':
+        form = OrdenForm(request.POST, instance=orden)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Orden actualizada correctamente.")
+            return redirect('lista_ordenes')
+    else:
+        form = OrdenForm(instance=orden)
+    return render(request, 'gestion/orden_form.html', {'form': form, 'titulo': 'Editar Orden', 'orden': orden})
+
+
+@requiere_login
+def eliminar_orden(request, pk):
+    """Vista para eliminar una orden."""
+    orden = get_object_or_404(Orden, pk=pk)
+    if request.method == 'POST':
+        orden.delete()
+        messages.success(request, "Orden eliminada correctamente.")
+        return redirect('lista_ordenes')
+    return render(request, 'gestion/confirmar_eliminar.html', {'objeto': orden, 'tipo': 'Orden'})
 
 
 @requiere_login
@@ -183,7 +472,40 @@ def lista_facturas(request):
 
 
 @requiere_login
-def lista_platos(request):
-    """Vista de platos - Solo para usuarios logueados"""
-    platos = Plato.objects.all()
-    return render(request, 'gestion/platos.html', {'platos': platos})
+def crear_factura(request):
+    """Vista para crear una nueva factura."""
+    if request.method == 'POST':
+        form = FacturaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Factura creada correctamente.")
+            return redirect('lista_facturas')
+    else:
+        form = FacturaForm()
+    return render(request, 'gestion/factura_form.html', {'form': form, 'titulo': 'Crear Factura'})
+
+
+@requiere_login
+def editar_factura(request, pk):
+    """Vista para editar una factura existente."""
+    factura = get_object_or_404(Factura, pk=pk)
+    if request.method == 'POST':
+        form = FacturaForm(request.POST, instance=factura)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Factura actualizada correctamente.")
+            return redirect('lista_facturas')
+    else:
+        form = FacturaForm(instance=factura)
+    return render(request, 'gestion/factura_form.html', {'form': form, 'titulo': 'Editar Factura', 'factura': factura})
+
+
+@requiere_login
+def eliminar_factura(request, pk):
+    """Vista para eliminar una factura."""
+    factura = get_object_or_404(Factura, pk=pk)
+    if request.method == 'POST':
+        factura.delete()
+        messages.success(request, "Factura eliminada correctamente.")
+        return redirect('lista_facturas')
+    return render(request, 'gestion/confirmar_eliminar.html', {'objeto': factura, 'tipo': 'Factura'})

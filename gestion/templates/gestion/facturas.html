@@ -46,13 +46,10 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="#" class="btn btn-sm btn-info" title="Ver factura">
-                                <i class="fas fa-eye"></i>
+                            <a href="{% url 'editar_factura' factura.id %}" class="btn btn-sm btn-warning" title="Editar factura">
+                                <i class="fas fa-edit"></i>
                             </a>
-                            <a href="#" class="btn btn-sm btn-warning" title="Descargar PDF">
-                                <i class="fas fa-download"></i>
-                            </a>
-                            <a href="#" class="btn btn-sm btn-danger" title="Eliminar">
+                            <a href="{% url 'eliminar_factura' factura.id %}" class="btn btn-sm btn-danger" title="Eliminar factura">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </td>
@@ -73,7 +70,7 @@
 <!-- Botón para agregar nueva factura -->
 <div class="row mt-4">
     <div class="col-12">
-        <a href="#" class="btn btn-success btn-lg">
+        <a href="{% url 'crear_factura' %}" class="btn btn-success btn-lg">
             <i class="fas fa-plus"></i> Nueva Factura
         </a>
     </div>

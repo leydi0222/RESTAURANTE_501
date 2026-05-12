@@ -4,8 +4,15 @@
 <!-- Header de la página -->
 <div class="page-header">
     <div class="container-fluid">
-        <h1><i class="fas fa-table"></i> Gestión de Mesas</h1>
-        <p>Administra las mesas disponibles en tu restaurante</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-table"></i> Gestión de Mesas</h1>
+                <p>Administra las mesas disponibles en tu restaurante</p>
+            </div>
+            <a href="{% url 'crear_mesa' %}" class="btn btn-success btn-lg">
+                <i class="fas fa-plus"></i> Nueva Mesa
+            </a>
+        </div>
     </div>
 </div>
 
@@ -39,14 +46,11 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="#" class="btn btn-sm btn-info" title="Ver detalles">
-                            <i class="fas fa-eye"></i>
+                        <a href="{% url 'editar_mesa' mesa.id %}" class="btn btn-sm btn-warning" title="Editar">
+                            <i class="fas fa-edit"></i> Editar
                         </a>
-                        <a href="#" class="btn btn-sm btn-warning" title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="#" class="btn btn-sm btn-danger" title="Eliminar">
-                            <i class="fas fa-trash"></i>
+                        <a href="{% url 'eliminar_mesa' mesa.id %}" class="btn btn-sm btn-danger" title="Eliminar">
+                            <i class="fas fa-trash"></i> Eliminar
                         </a>
                     </td>
                 </tr>

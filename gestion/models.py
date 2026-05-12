@@ -4,18 +4,6 @@ from django.contrib.auth.hashers import make_password, check_password
 
 
 class Usuario(models.Model):
-    """
-    Modelo de Usuario personalizado que se conecta con la tabla SQL 'usuarios'.
-    
-    EXPLICACIÓN:
-    - id_usuario: Clave primaria AUTOINCREMENTAL (Django la genera automáticamente)
-    - email: Campo único para login (no pueden haber dos emails iguales)
-    - contrasena: Se almacena encriptada (nunca en texto plano)
-    - rol: Tipo de usuario (ej: 'administrador del restaurante')
-    
-    NOTA: Este modelo SOLO usa los campos que existen en tu tabla SQL.
-    Si necesitas agregar más campos, primero modifica la tabla en SQL Server.
-    """
     ROLES = [
         ('administrador del restaurante', 'Administrador del Restaurante'),
     ]
@@ -37,10 +25,6 @@ class Usuario(models.Model):
     def set_password(self, raw_password):
         """
         EXPLICACIÓN: Encripta la contraseña antes de guardarla en la BD.
-        Esto es MUY IMPORTANTE por seguridad. Nunca guardes contraseñas en texto plano.
-        
-        make_password() usa algoritmos criptográficos para que sea prácticamente imposible
-        recuperar la contraseña original.
         """
         self.contrasena = make_password(raw_password)
     

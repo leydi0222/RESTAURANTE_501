@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.hashers import make_password
 from django.db import connection
-from .models import Usuario
+from .models import Usuario, Cliente, Empleado, Mesa, Plato, Orden, Factura
 
 
 class LoginForm(forms.Form):
@@ -144,4 +144,244 @@ class RegistroForm(forms.ModelForm):
         
         except Exception as e:
             raise forms.ValidationError(f"Error al crear el usuario: {str(e)}")
+
+
+# ============ FORMULARIOS PARA CRUD ============
+
+class ClienteForm(forms.ModelForm):
+    """
+    EXPLICACIÓN: Formulario para crear/editar clientes.
+    
+    Los campos son:
+    - nombre: Nombre del cliente (requerido)
+    - telefono: Teléfono de contacto (opcional)
+    - correo: Email del cliente (opcional pero único)
+    """
+    class Meta:
+        model = Cliente
+        fields = ['nombre', 'telefono', 'correo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del cliente',
+                'required': True
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Teléfono (ej: 3001234567)',
+            }),
+            'correo': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'correo@ejemplo.com',
+            }),
+        }
+        labels = {
+            'nombre': 'Nombre',
+            'telefono': 'Teléfono',
+            'correo': 'Email',
+        }
+
+
+class EmpleadoForm(forms.ModelForm):
+    """
+    EXPLICACIÓN: Formulario para crear/editar empleados.
+    
+    Los campos son:
+    - nombre: Nombre del empleado (requerido)
+    - cargo: Tipo de cargo (Mesero, Cajero, etc)
+    - telefono: Teléfono de contacto (opcional)
+    - correo: Email del empleado (opcional pero único)
+    """
+    class Meta:
+        model = Empleado
+        fields = ['nombre', 'cargo', 'telefono', 'correo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del empleado',
+            }),
+            'cargo': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Teléfono',
+            }),
+            'correo': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'correo@ejemplo.com',
+            }),
+        }
+        labels = {
+            'nombre': 'Nombre',
+            'cargo': 'Cargo',
+            'telefono': 'Teléfono',
+            'correo': 'Email',
+        }
+
+
+class MesaForm(forms.ModelForm):
+    """
+    EXPLICACIÓN: Formulario para crear/editar mesas.
+    
+    Los campos son:
+    - numero_mesa: Número identificador de la mesa
+    - capacidad: Cuántas personas pueden sentarse
+    - estado_mesa: Disponible, Ocupada o Reservada
+    """
+    class Meta:
+        model = Mesa
+        fields = ['numero_mesa', 'capacidad', 'estado_mesa']
+        widgets = {
+            'numero_mesa': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: 1, 2, 3...',
+            }),
+            'capacidad': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: 4',
+            }),
+            'estado_mesa': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+        }
+        labels = {
+            'numero_mesa': 'Número de Mesa',
+            'capacidad': 'Capacidad',
+            'estado_mesa': 'Estado',
+        }
+
+
+class PlatoForm(forms.ModelForm):
+    """
+    EXPLICACIÓN: Formulario para crear/editar platos.
+    
+    Los campos son:
+    - nombre_plato: Nombre del plato
+    - descripcion: Descripción de ingredientes (opcional)
+    - precio: Precio del plato
+    - categoria: Categoría (Entrada, Plato fuerte, etc)
+    - disponible: Si está disponible o no
+    """
+    class Meta:
+        model = Plato
+        fields = ['nombre_plato', 'descripcion', 'precio', 'categoria', 'disponible']
+        widgets = {
+            'nombre_plato': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del plato',
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Descripción (ingredientes, alergenos, etc)',
+                'rows': 3,
+            }),
+            'precio': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0.00',
+                'step': '0.01',
+            }),
+            'categoria': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: Entrada, Plato fuerte, Postre',
+            }),
+            'disponible': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+            }),
+        }
+        labels = {
+            'nombre_plato': 'Nombre del Plato',
+            'descripcion': 'Descripción',
+            'precio': 'Precio',
+            'categoria': 'Categoría',
+            'disponible': 'Disponible',
+        }
+
+
+class OrdenForm(forms.ModelForm):
+    """
+    EXPLICACIÓN: Formulario para crear/editar órdenes.
+    
+    Incluye:
+    - cliente
+    - empleado
+    - mesa
+    - estado_orden
+    - total
+    """
+    class Meta:
+        model = Orden
+        fields = ['cliente', 'empleado', 'mesa', 'estado_orden', 'total']
+        widgets = {
+            'cliente': forms.Select(attrs={'class': 'form-control'}),
+            'empleado': forms.Select(attrs={'class': 'form-control'}),
+            'mesa': forms.Select(attrs={'class': 'form-control'}),
+            'estado_orden': forms.Select(attrs={'class': 'form-control'}),
+            'total': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Total de la orden',
+                'step': '0.01',
+            }),
+        }
+        labels = {
+            'cliente': 'Cliente',
+            'empleado': 'Empleado',
+            'mesa': 'Mesa',
+            'estado_orden': 'Estado de la Orden',
+            'total': 'Total',
+        }
+
+
+class FacturaForm(forms.ModelForm):
+    """
+    EXPLICACIÓN: Formulario para crear/editar facturas.
+    
+    Este formulario calcula automáticamente:
+    - subtotal = orden.total
+    - total_factura = subtotal + impuesto
+    """
+    class Meta:
+        model = Factura
+        fields = ['orden', 'impuesto', 'metodo_pago']
+        widgets = {
+            'orden': forms.Select(attrs={'class': 'form-control'}),
+            'impuesto': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Impuesto en número',
+                'step': '0.01',
+            }),
+            'metodo_pago': forms.Select(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'orden': 'Orden',
+            'impuesto': 'Impuesto',
+            'metodo_pago': 'Método de Pago',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['orden'].queryset = Orden.objects.filter(pk=self.instance.orden.pk)
+        else:
+            self.fields['orden'].queryset = Orden.objects.exclude(factura__isnull=False)
+
+    def clean_orden(self):
+        orden = self.cleaned_data.get('orden')
+        if orden and Factura.objects.filter(orden=orden).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('Esta orden ya tiene una factura asociada.')
+        return orden
+
+    def clean_impuesto(self):
+        impuesto = self.cleaned_data.get('impuesto')
+        if impuesto is not None and impuesto < 0:
+            raise forms.ValidationError('El impuesto no puede ser negativo.')
+        return impuesto
+
+    def save(self, commit=True):
+        factura = super().save(commit=False)
+        factura.subtotal = factura.orden.total
+        factura.total_factura = factura.subtotal + factura.impuesto
+        if commit:
+            factura.save()
+        return factura
 
