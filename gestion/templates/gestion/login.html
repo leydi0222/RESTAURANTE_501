@@ -1,0 +1,60 @@
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+<div class="container">
+    <div class="login-container">
+        <div class="login-header">
+            <i class="fas fa-utensils fa-3x" style="color: #e67e22;"></i>
+            <h2>Pasta La Vista</h2>
+            <p>Panel de Administración</p>
+        </div>
+
+        <!-- Mostrar mensajes de error o éxito -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Campo EMAIL -->
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <span class="error-msg">{{ form.email.errors }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Campo CONTRASEÑA -->
+            <div class="form-group">
+                <label for="id_contrasena">Contraseña</label>
+                {{ form.contrasena }}
+                {% if form.contrasena.errors %}
+                    <span class="error-msg">{{ form.contrasena.errors }}</span>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </button>
+        </form>
+
+        <!-- Link para registrarse -->
+        <div style="text-align: center; margin-top: 20px;">
+            <p>¿No tienes cuenta? 
+                <a href="{% url 'registro' %}" style="color: #e67e22; font-weight: bold;">
+                    Regístrate aquí
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
