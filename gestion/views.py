@@ -359,9 +359,9 @@ def eliminar_cliente(request, pk):
 @requiere_permiso('empleados')
 def lista_empleados(request):
     """
-    EXPLICACIÓN: Muestra la lista de todos los empleados.
+    EXPLICACIÓN: Muestra la lista de todos los usuarios con roles de Empleado y Cajero.
     """
-    empleados = Empleado.objects.all()
+    empleados = Usuario.objects.filter(rol__in=['Empleado', 'Cajero'])
     return render(request, 'gestion/empleados.html', {'empleados': empleados})
 
 
