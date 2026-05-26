@@ -136,7 +136,7 @@ class Orden(models.Model):
     ]
 
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    empleado = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     mesa = models.ForeignKey(Mesa, on_delete=models.CASCADE)
     fecha_hora = models.DateTimeField(auto_now_add=True)
     estado_orden = models.CharField(max_length=20, choices=ESTADOS_ORDEN, default='Activa')

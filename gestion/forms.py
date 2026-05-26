@@ -381,12 +381,17 @@ class OrdenForm(forms.ModelForm):
 
     El total se calcula automáticamente a partir de los detalles de la orden.
     """
+    empleado = forms.ModelChoiceField(
+        queryset=Usuario.objects.filter(rol='Empleado'),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label='Empleado'
+    )
+
     class Meta:
         model = Orden
         fields = ['cliente', 'empleado', 'mesa', 'estado_orden']
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-control'}),
-            'empleado': forms.Select(attrs={'class': 'form-control'}),
             'mesa': forms.Select(attrs={'class': 'form-control'}),
             'estado_orden': forms.Select(attrs={'class': 'form-control'}),
         }
