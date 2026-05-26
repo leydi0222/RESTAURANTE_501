@@ -1,4 +1,4 @@
-{% load static %}/*rutas para archivos estaticos*/
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,15 +10,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    /*font-awesome:libreria de iconos */
-
-    /*usar archivos estaticos para estilos personalizados*/
+    
+   
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> /*static...:decirle al servidor dónde están guardados esos archivos.
-    <link rel="stylesheet" href="{% static 'css/navbar.css' %}"> /*navbarcss: estilos para la barra de navegación*/
-    <link rel="stylesheet" href="{% static 'css/cards.css' %}">/*cards.css: estilos de tarjetas estadisticas*/
-    <link rel="stylesheet" href="{% static 'css/tables.css' %}">/*tables.css:estilos de tablas*/
-    <link rel="stylesheet" href="{% static 'css/footer.css' %}">/*foote.css: estilos de pie de pagina*/
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">  
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}"> 
+    <link rel="stylesheet" href="{% static 'css/cards.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tables.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
 </head>
 <body>
     <!-- Navbar -->
