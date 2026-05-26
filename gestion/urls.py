@@ -5,7 +5,9 @@ from . import views
 urlpatterns = [
     # RUTAS DE AUTENTICACIÓN
     path('login/', views.login_view, name='login'),              # LOGIN
-    path('registro/', views.registro_view, name='registro'),     # REGISTRO
+    path('registro/', views.registro_view, name='registro'),     # REGISTRO alias seguro de administrador
+    path('usuarios/crear/', views.registro_view, name='crear_usuario'),     # CREAR USUARIOS
+    path('permisos-roles/', views.configurar_permisos, name='configurar_permisos'),
     path('logout/', views.logout_view, name='logout'),           # LOGOUT
     
     # RUTA DE INICIO

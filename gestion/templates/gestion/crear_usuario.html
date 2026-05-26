@@ -1,0 +1,119 @@
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+<div class="container">
+    <div class="login-container">
+        <div class="login-header">
+            <i class="fas fa-user-plus fa-3x" style="color: #e67e22;"></i>
+            <h2>Crear Usuario</h2>
+            <p>Administra el acceso de nuevos usuarios en el sistema</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <span class="error-msg">
+                        {% for error in form.email.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_contrasena">Contraseña</label>
+                {{ form.contrasena }}
+                {% if form.contrasena.errors %}
+                    <span class="error-msg">
+                        {% for error in form.contrasena.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_contrasena_confirmacion">Confirmar Contraseña</label>
+                {{ form.contrasena_confirmacion }}
+                {% if form.contrasena_confirmacion.errors %}
+                    <span class="error-msg">
+                        {% for error in form.contrasena_confirmacion.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_rol">Rol</label>
+                {{ form.rol }}
+                {% if form.rol.errors %}
+                    <span class="error-msg">
+                        {% for error in form.rol.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </span>
+                {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="error-msg">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-user-check"></i> Crear Usuario
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+.alert {
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.error-msg {
+    color: #dc3545;
+    font-size: 12px;
+    display: block;
+    margin-top: 5px;
+}
+
+.error-msg p {
+    margin: 0;
+}
+</style>
+{% endblock %}

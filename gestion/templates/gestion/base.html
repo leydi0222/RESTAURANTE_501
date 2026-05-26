@@ -22,7 +22,7 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">/*navbar-expand-ig: adaptarse al tamaño de pantalla, stickip-top:quedarse fija en la parte superior de la pantalla*/
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-utensils"></i>
@@ -38,43 +38,60 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/"><i class="fas fa-home"></i> Inicio</a>
                     </li>
+                    {% if request.session.usuario_permisos and request.session.usuario_permisos.clientes %}
                     <li class="nav-item">
                         <a class="nav-link" href="/clientes/"><i class="fas fa-users"></i> Clientes</a>
                     </li>
+                    {% endif %}
+                    {% if request.session.usuario_permisos and request.session.usuario_permisos.empleados %}
                     <li class="nav-item">
                         <a class="nav-link" href="/empleados/"><i class="fas fa-id-badge"></i> Empleados</a>
                     </li>
+                    {% endif %}
+                    {% if request.session.usuario_permisos and request.session.usuario_permisos.mesas %}
                     <li class="nav-item">
                         <a class="nav-link" href="/mesas/"><i class="fas fa-table"></i> Mesas</a>
                     </li>
+                    {% endif %}
+                    {% if request.session.usuario_permisos and request.session.usuario_permisos.platos %}
                     <li class="nav-item">
                         <a class="nav-link" href="/platos/"><i class="fas fa-bowl-food"></i> Platos</a>
                     </li>
+                    {% endif %}
+                    {% if request.session.usuario_permisos and request.session.usuario_permisos.ordenes %}
                     <li class="nav-item">
                         <a class="nav-link" href="/ordenes/"><i class="fas fa-list"></i> Órdenes</a>
                     </li>
+                    {% endif %}
+                    {% if request.session.usuario_permisos and request.session.usuario_permisos.facturas %}
                     <li class="nav-item">
                         <a class="nav-link" href="/facturas/"><i class="fas fa-receipt"></i> Facturas</a>
+                    </li>
+                    {% endif %}
+                    {% if request.session.usuario_rol == 'Administrador' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'crear_usuario' %}"><i class="fas fa-user-plus"></i> Crear Usuarios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'configurar_permisos' %}"><i class="fas fa-user-shield"></i> Permisos</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/admin/"><i class="fas fa-cog"></i> Admin</a>
                     </li>
+                    {% endif %}
                     <!-- Usuario logueado -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle"></i> {{ request.session.usuario_email }}
+                            <i class="fas fa-user-circle"></i> {{ request.session.usuario_email }}{% if request.session.usuario_rol %} ({{ request.session.usuario_rol }}){% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
                         </ul>
                     </li>
                     {% else %}
-                    <!-- No está logueado: mostrar botones de Login y Registro -->
+                    <!-- No está logueado: mostrar botón de Login -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'registro' %}"><i class="fas fa-user-plus"></i> Registrarse</a>
                     </li>
                     {% endif %}
                 </ul>

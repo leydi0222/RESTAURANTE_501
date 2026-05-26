@@ -2,7 +2,7 @@ from decimal import Decimal
 from django import forms
 from django.contrib.auth.hashers import make_password
 from django.db import connection
-from .models import Usuario, Cliente, Empleado, Mesa, Plato, Orden, Factura
+from .models import Usuario, RolMenuPermiso, Cliente, Empleado, Mesa, Plato, Orden, Factura
 
 
 class LoginForm(forms.Form):
@@ -57,10 +57,18 @@ class RegistroForm(forms.ModelForm):
         }),
         label='Confirmar Contraseña'
     )
+
+    rol = forms.ChoiceField(
+        choices=Usuario.ROLES,
+        widget=forms.Select(attrs={
+            'class': 'form-control-custom',
+        }),
+        label='Rol'
+    )
     
     class Meta:
         model = Usuario
-        fields = ['email', 'contrasena']
+        fields = ['email', 'contrasena', 'rol']
         widgets = {
             'email': forms.EmailInput(attrs={
                 'class': 'form-control-custom',
@@ -74,6 +82,7 @@ class RegistroForm(forms.ModelForm):
         labels = {
             'email': 'Email',
             'contrasena': 'Contraseña',
+            'rol': 'Rol',
         }
     
     def clean(self):
@@ -124,27 +133,60 @@ class RegistroForm(forms.ModelForm):
         """
         email = self.cleaned_data['email']
         contrasena_plana = self.cleaned_data['contrasena']
-        rol = 'administrador del restaurante'
-        
+        rol = self.cleaned_data.get('rol', 'Administrador')
+
+        # Mapear el rol del formulario al valor exacto que espera la BD
+        ROLE_DB_MAP = {
+            'Administrador': 'administrador del restaurante',
+            'Empleado': 'Empleado',
+            'Cajero': 'Cajero',
+        }
+        db_rol = ROLE_DB_MAP.get(rol, rol)
+
         # Paso 1: Encriptar la contraseña
         contrasena_encriptada = make_password(contrasena_plana)
-        
+
         # Paso 2 y 3: Usar SQL directo para insertar
         # Nota: No incluimos id_usuario porque SQL Server lo genera automáticamente
         sql = """
             INSERT INTO usuarios (email, contrasena, rol)
             VALUES (%s, %s, %s)
         """
-        
+
         try:
             with connection.cursor() as cursor:
-                cursor.execute(sql, [email, contrasena_encriptada, rol])
-            
+                cursor.execute(sql, [email, contrasena_encriptada, db_rol])
+
             # Paso 4: El commit se hace automáticamente con el context manager
             return True
-        
+
         except Exception as e:
             raise forms.ValidationError(f"Error al crear el usuario: {str(e)}")
+
+
+class RolMenuPermisoForm(forms.ModelForm):
+    """Formulario para editar los permisos de visualización de cada rol."""
+
+    class Meta:
+        model = RolMenuPermiso
+        fields = [
+            'ver_clientes',
+            'ver_empleados',
+            'ver_mesas',
+            'ver_platos',
+            'ver_ordenes',
+            'ver_facturas',
+            'ver_usuarios',
+        ]
+        widgets = {
+            'ver_clientes': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'ver_empleados': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'ver_mesas': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'ver_platos': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'ver_ordenes': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'ver_facturas': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'ver_usuarios': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
 
 
 # ============ FORMULARIOS PARA CRUD ============

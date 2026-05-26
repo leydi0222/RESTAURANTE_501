@@ -5,7 +5,9 @@ from django.contrib.auth.hashers import make_password, check_password
 
 class Usuario(models.Model):
     ROLES = [
-        ('administrador del restaurante', 'Administrador del Restaurante'),
+        ('Administrador', 'Administrador'),
+        ('Empleado', 'Empleado'),
+        ('Cajero', 'Cajero'),
     ]
     
     # Especificar explícitamente la clave primaria autoincremental
@@ -13,7 +15,7 @@ class Usuario(models.Model):
     
     email = models.EmailField(unique=True, max_length=255)
     contrasena = models.CharField(max_length=255)
-    rol = models.CharField(max_length=50, choices=ROLES, default='administrador del restaurante')
+    rol = models.CharField(max_length=50, choices=ROLES, default='Administrador')
     
     class Meta:
         db_table = 'usuarios'  # Apunta a tu tabla SQL existente
@@ -27,13 +29,36 @@ class Usuario(models.Model):
         EXPLICACIÓN: Encripta la contraseña antes de guardarla en la BD.
         """
         self.contrasena = make_password(raw_password)
-    
+
     def check_password(self, raw_password):
         """
         EXPLICACIÓN: Verifica si la contraseña ingresada es correcta.
         Compara la contraseña ingresada con la encriptada en la BD.
         """
         return check_password(raw_password, self.contrasena)
+
+
+class RolMenuPermiso(models.Model):
+    ROLES = [
+        ('Administrador', 'Administrador'),
+        ('Empleado', 'Empleado'),
+        ('Cajero', 'Cajero'),
+    ]
+
+    role = models.CharField(max_length=50, choices=ROLES, unique=True)
+    ver_clientes = models.BooleanField(default=False)
+    ver_empleados = models.BooleanField(default=False)
+    ver_mesas = models.BooleanField(default=False)
+    ver_platos = models.BooleanField(default=False)
+    ver_ordenes = models.BooleanField(default=False)
+    ver_facturas = models.BooleanField(default=False)
+    ver_usuarios = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'rol_menu_permiso'
+
+    def __str__(self):
+        return self.role
 
 
 class Cliente(models.Model):

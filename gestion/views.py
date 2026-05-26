@@ -1,14 +1,115 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import ProgrammingError
 
 # Importar modelos
-from .models import Cliente, Empleado, Mesa, Orden, Factura, Plato, Usuario
+from .models import Cliente, Empleado, Mesa, Orden, Factura, Plato, Usuario, RolMenuPermiso
 # Importar formularios
 from .forms import (
-    LoginForm, RegistroForm, ClienteForm, EmpleadoForm,
+    LoginForm, RegistroForm, RolMenuPermisoForm, ClienteForm, EmpleadoForm,
     MesaForm, PlatoForm, OrdenForm, FacturaForm
 )
+
+
+def requiere_login(view_func):
+    """
+    EXPLICACIÓN: Decorador personalizado para proteger vistas.
+    
+    Si el usuario no está logueado, lo redirige al login.
+    Si está logueado, lo deja pasar a la vista.
+    """
+    def wrapped_view(request, *args, **kwargs):
+        if 'usuario_id' not in request.session:
+            return redirect('login')
+        return view_func(request, *args, **kwargs)
+    return wrapped_view
+
+
+DEFAULT_ROL_PERMISOS = {
+    'Administrador': {
+        'ver_clientes': True,
+        'ver_empleados': True,
+        'ver_mesas': True,
+        'ver_platos': True,
+        'ver_ordenes': True,
+        'ver_facturas': True,
+        'ver_usuarios': True,
+    },
+    'Empleado': {
+        'ver_clientes': False,
+        'ver_empleados': False,
+        'ver_mesas': True,
+        'ver_platos': True,
+        'ver_ordenes': True,
+        'ver_facturas': False,
+        'ver_usuarios': False,
+    },
+    'Cajero': {
+        'ver_clientes': False,
+        'ver_empleados': True,
+        'ver_mesas': False,
+        'ver_platos': False,
+        'ver_ordenes': False,
+        'ver_facturas': False,
+        'ver_usuarios': False,
+    },
+}
+
+
+def obtener_permisos_por_rol(rol):
+    """Devuelve el diccionario de permisos que corresponde a un rol."""
+    rol_permisos = DEFAULT_ROL_PERMISOS.get(rol, DEFAULT_ROL_PERMISOS['Empleado'])
+
+    try:
+        permiso, _ = RolMenuPermiso.objects.get_or_create(
+            role=rol,
+            defaults=rol_permisos
+        )
+
+        return {
+            'clientes': permiso.ver_clientes,
+            'empleados': permiso.ver_empleados,
+            'mesas': permiso.ver_mesas,
+            'platos': permiso.ver_platos,
+            'ordenes': permiso.ver_ordenes,
+            'facturas': permiso.ver_facturas,
+            'usuarios': permiso.ver_usuarios,
+        }
+    except ProgrammingError:
+        # Si la tabla no existe en la BD, usamos los permisos por defecto.
+        return {
+            'clientes': rol_permisos['ver_clientes'],
+            'empleados': rol_permisos['ver_empleados'],
+            'mesas': rol_permisos['ver_mesas'],
+            'platos': rol_permisos['ver_platos'],
+            'ordenes': rol_permisos['ver_ordenes'],
+            'facturas': rol_permisos['ver_facturas'],
+            'usuarios': rol_permisos['ver_usuarios'],
+        }
+
+
+def requiere_admin(view_func):
+    """Decorador para proteger vistas que solo deben ver administradores."""
+    def wrapped_view(request, *args, **kwargs):
+        if request.session.get('usuario_rol') != 'Administrador':
+            messages.error(request, 'No tienes permisos para acceder a esta página.')
+            return redirect('inicio')
+        return view_func(request, *args, **kwargs)
+    return wrapped_view
+
+
+def requiere_permiso(permiso_nombre):
+    """Decorador para proteger rutas según permisos configurados por rol."""
+    def decorator(view_func):
+        def wrapped_view(request, *args, **kwargs):
+            permisos = request.session.get('usuario_permisos', {})
+            if not permisos.get(permiso_nombre, False):
+                messages.error(request, 'No tienes permiso para ver esta sección.')
+                return redirect('inicio')
+            return view_func(request, *args, **kwargs)
+        return wrapped_view
+    return decorator
 
 
 # ============ VISTAS DE AUTENTICACIÓN ============
@@ -45,6 +146,11 @@ def login_view(request):
                     # IMPORTANTE: Usamos id_usuario (no id) porque ese es el nombre del campo
                     request.session['usuario_id'] = usuario.id_usuario
                     request.session['usuario_email'] = usuario.email
+                    rol_usuario = usuario.rol
+                    if rol_usuario == 'administrador del restaurante':
+                        rol_usuario = 'Administrador'
+                    request.session['usuario_rol'] = rol_usuario
+                    request.session['usuario_permisos'] = obtener_permisos_por_rol(rol_usuario)
                     
                     # Mostrar mensaje de bienvenida
                     messages.success(request, f"¡Bienvenido {usuario.email}!")
@@ -66,12 +172,14 @@ def login_view(request):
     return render(request, 'gestion/login.html', context)
 
 
+@requiere_login
+@requiere_admin
 def registro_view(request):
     """
-    EXPLICACIÓN: Vista para registrar nuevos usuarios.
+    EXPLICACIÓN: Vista para que un administrador cree nuevos usuarios.
     
     QUÉ HACE:
-    1. Si el método es GET: Muestra el formulario de registro
+    1. Si el método es GET: Muestra el formulario de creación de usuario
     2. Si el método es POST:
        - Valida los datos del formulario
        - Si son válidos, crea el usuario usando SQL directo
@@ -83,24 +191,51 @@ def registro_view(request):
         
         if form.is_valid():
             try:
-                # Guardar el nuevo usuario (esto usa SQL directo)
                 form.save()
-                
-                # Mostrar mensaje de éxito
-                messages.success(request, "¡Usuario registrado correctamente! Por favor inicia sesión.")
-                
-                # Redirigir al login para que inicie sesión
-                return redirect('login')
-            
+                messages.success(request, "¡Usuario creado correctamente.")
+                return redirect('crear_usuario')
             except Exception as e:
-                # Si hay error, mostrar mensaje
                 messages.error(request, f"Error al registrar: {str(e)}")
-    
     else:
         form = RegistroForm()
     
     context = {'form': form}
-    return render(request, 'gestion/register.html', context)
+    return render(request, 'gestion/crear_usuario.html', context)
+
+
+@requiere_login
+@requiere_admin
+def configurar_permisos(request):
+    """Vista para que el administrador configure qué puede ver cada rol."""
+    for rol in ['Administrador', 'Empleado', 'Cajero']:
+        obtener_permisos_por_rol(rol)
+
+    try:
+        roles_permisos = list(RolMenuPermiso.objects.all())
+    except ProgrammingError:
+        # Si la tabla no existe, creamos instancias temporales con permisos por defecto.
+        roles_permisos = [RolMenuPermiso(role=rol, **DEFAULT_ROL_PERMISOS[rol]) for rol in DEFAULT_ROL_PERMISOS]
+
+    forms = [RolMenuPermisoForm(prefix=permiso.role, instance=permiso) for permiso in roles_permisos]
+
+    if request.method == 'POST':
+        forms = [RolMenuPermisoForm(request.POST, prefix=permiso.role, instance=permiso) for permiso in roles_permisos]
+        if all(form.is_valid() for form in forms):
+            try:
+                for form in forms:
+                    form.save()
+                # Actualizar los permisos de la sesión del administrador
+                request.session['usuario_permisos'] = obtener_permisos_por_rol(request.session.get('usuario_rol', 'Administrador'))
+                messages.success(request, 'Permisos actualizados correctamente.')
+                return redirect('configurar_permisos')
+            except ProgrammingError:
+                messages.error(request, 'No se pudo guardar en la base de datos porque falta la tabla de permisos.')
+
+    context = {
+        'forms': forms,
+        'roles_permisos': roles_permisos,
+    }
+    return render(request, 'gestion/configurar_permisos.html', context)
 
 
 def logout_view(request):
@@ -112,28 +247,12 @@ def logout_view(request):
     - Lo redirige a la página de login
     """
     # Eliminar la sesión
-    if 'usuario_id' in request.session:
-        del request.session['usuario_id']
-    if 'usuario_email' in request.session:
-        del request.session['usuario_email']
+    for key in ['usuario_id', 'usuario_email', 'usuario_rol', 'usuario_permisos']:
+        if key in request.session:
+            del request.session[key]
     
     messages.success(request, "Sesión cerrada correctamente.")
     return redirect('login')
-
-
-# Middleware para verificar sesión
-def requiere_login(view_func):
-    """
-    EXPLICACIÓN: Decorador personalizado para proteger vistas.
-    
-    Si el usuario no está logueado, lo redirige al login.
-    Si está logueado, lo deja pasar a la vista.
-    """
-    def wrapped_view(request, *args, **kwargs):
-        if 'usuario_id' not in request.session:
-            return redirect('login')
-        return view_func(request, *args, **kwargs)
-    return wrapped_view
 
 
 # ============ VISTAS DE LA APLICACIÓN (protegidas) ============
@@ -143,10 +262,11 @@ def inicio(request):
     """Vista de inicio - Solo para usuarios logueados"""
     context = {
         'total_clientes': Cliente.objects.count(),
-        'total_Empleado': Empleado.objects.count(),
-        'total_Mesa': Mesa.objects.count(),
-        'total_Orden': Orden.objects.count(),
-        'total_Factura': Factura.objects.count(),
+        'total_empleados': Empleado.objects.count(),
+        'total_mesas': Mesa.objects.count(),
+        'total_platos': Plato.objects.count(),
+        'total_ordenes': Orden.objects.count(),
+        'total_facturas': Factura.objects.count(),
     }
     return render(request, 'gestion/inicio.html', context)
 
@@ -154,6 +274,7 @@ def inicio(request):
 # ============ CRUD CLIENTES ============
 
 @requiere_login
+@requiere_permiso('clientes')
 def lista_clientes(request):
     """
     EXPLICACIÓN: Muestra la lista de todos los clientes.
@@ -167,6 +288,7 @@ def lista_clientes(request):
 
 
 @requiere_login
+@requiere_permiso('clientes')
 def crear_cliente(request):
     """
     EXPLICACIÓN: Vista para crear un nuevo cliente.
@@ -188,6 +310,7 @@ def crear_cliente(request):
 
 
 @requiere_login
+@requiere_permiso('clientes')
 def editar_cliente(request, pk):
     """
     EXPLICACIÓN: Vista para editar un cliente existente.
@@ -211,6 +334,7 @@ def editar_cliente(request, pk):
 
 
 @requiere_login
+@requiere_permiso('clientes')
 def eliminar_cliente(request, pk):
     """
     EXPLICACIÓN: Vista para eliminar un cliente.
@@ -232,6 +356,7 @@ def eliminar_cliente(request, pk):
 # ============ CRUD EMPLEADOS ============
 
 @requiere_login
+@requiere_permiso('empleados')
 def lista_empleados(request):
     """
     EXPLICACIÓN: Muestra la lista de todos los empleados.
@@ -241,6 +366,7 @@ def lista_empleados(request):
 
 
 @requiere_login
+@requiere_permiso('empleados')
 def crear_empleado(request):
     """
     EXPLICACIÓN: Vista para crear un nuevo empleado.
@@ -258,6 +384,7 @@ def crear_empleado(request):
 
 
 @requiere_login
+@requiere_permiso('empleados')
 def editar_empleado(request, pk):
     """
     EXPLICACIÓN: Vista para editar un empleado existente.
@@ -277,6 +404,7 @@ def editar_empleado(request, pk):
 
 
 @requiere_login
+@requiere_permiso('empleados')
 def eliminar_empleado(request, pk):
     """
     EXPLICACIÓN: Vista para eliminar un empleado.
@@ -294,6 +422,7 @@ def eliminar_empleado(request, pk):
 # ============ CRUD MESAS ============
 
 @requiere_login
+@requiere_permiso('mesas')
 def lista_mesas(request):
     """
     EXPLICACIÓN: Muestra la lista de todas las mesas.
@@ -303,6 +432,7 @@ def lista_mesas(request):
 
 
 @requiere_login
+@requiere_permiso('mesas')
 def crear_mesa(request):
     """
     EXPLICACIÓN: Vista para crear una nueva mesa.
@@ -320,6 +450,7 @@ def crear_mesa(request):
 
 
 @requiere_login
+@requiere_permiso('mesas')
 def editar_mesa(request, pk):
     """
     EXPLICACIÓN: Vista para editar una mesa existente.
@@ -339,6 +470,7 @@ def editar_mesa(request, pk):
 
 
 @requiere_login
+@requiere_permiso('mesas')
 def eliminar_mesa(request, pk):
     """
     EXPLICACIÓN: Vista para eliminar una mesa.
@@ -356,6 +488,7 @@ def eliminar_mesa(request, pk):
 # ============ CRUD PLATOS ============
 
 @requiere_login
+@requiere_permiso('platos')
 def lista_platos(request):
     """
     EXPLICACIÓN: Muestra la lista de todos los platos.
@@ -365,6 +498,7 @@ def lista_platos(request):
 
 
 @requiere_login
+@requiere_permiso('platos')
 def crear_plato(request):
     """
     EXPLICACIÓN: Vista para crear un nuevo plato.
@@ -382,6 +516,7 @@ def crear_plato(request):
 
 
 @requiere_login
+@requiere_permiso('platos')
 def editar_plato(request, pk):
     """
     EXPLICACIÓN: Vista para editar un plato existente.
@@ -401,6 +536,7 @@ def editar_plato(request, pk):
 
 
 @requiere_login
+@requiere_permiso('platos')
 def eliminar_plato(request, pk):
     """
     EXPLICACIÓN: Vista para eliminar un plato.
@@ -418,6 +554,7 @@ def eliminar_plato(request, pk):
 # ============ VISTAS DE SOLO LECTURA (Órdenes y Facturas) ============
 
 @requiere_login
+@requiere_permiso('ordenes')
 def lista_ordenes(request):
     """Vista de órdenes - Solo para usuarios logueados"""
     ordenes = Orden.objects.all()
@@ -425,6 +562,7 @@ def lista_ordenes(request):
 
 
 @requiere_login
+@requiere_permiso('ordenes')
 def crear_orden(request):
     """Vista para crear una nueva orden."""
     if request.method == 'POST':
@@ -439,6 +577,7 @@ def crear_orden(request):
 
 
 @requiere_login
+@requiere_permiso('ordenes')
 def editar_orden(request, pk):
     """Vista para editar una orden existente."""
     orden = get_object_or_404(Orden, pk=pk)
@@ -454,6 +593,7 @@ def editar_orden(request, pk):
 
 
 @requiere_login
+@requiere_permiso('ordenes')
 def eliminar_orden(request, pk):
     """Vista para eliminar una orden."""
     orden = get_object_or_404(Orden, pk=pk)
@@ -465,6 +605,7 @@ def eliminar_orden(request, pk):
 
 
 @requiere_login
+@requiere_permiso('facturas')
 def lista_facturas(request):
     """Vista de facturas - Solo para usuarios logueados"""
     facturas = Factura.objects.all()
@@ -472,6 +613,7 @@ def lista_facturas(request):
 
 
 @requiere_login
+@requiere_permiso('facturas')
 def crear_factura(request):
     """Vista para crear una nueva factura."""
     if request.method == 'POST':
@@ -486,6 +628,7 @@ def crear_factura(request):
 
 
 @requiere_login
+@requiere_permiso('facturas')
 def editar_factura(request, pk):
     """Vista para editar una factura existente."""
     factura = get_object_or_404(Factura, pk=pk)
@@ -501,6 +644,7 @@ def editar_factura(request, pk):
 
 
 @requiere_login
+@requiere_permiso('facturas')
 def eliminar_factura(request, pk):
     """Vista para eliminar una factura."""
     factura = get_object_or_404(Factura, pk=pk)
