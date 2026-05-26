@@ -2,7 +2,7 @@ from decimal import Decimal
 from django import forms
 from django.contrib.auth.hashers import make_password
 from django.db import connection
-from .models import Usuario, RolMenuPermiso, Cliente, Empleado, Mesa, Plato, Orden, Factura
+from .models import Usuario, RolMenuPermiso, Cliente, Empleado, Mesa, Plato, Orden, DetalleOrden, Factura
 
 
 class LoginForm(forms.Form):
@@ -341,6 +341,34 @@ class PlatoForm(forms.ModelForm):
         }
 
 
+class DetalleOrdenForm(forms.ModelForm):
+    """
+    EXPLICACIÓN: Formulario para crear/editar detalles de una orden.
+    
+    Los campos incluyen:
+    - plato: seleccionar el plato
+    - cantidad: cantidad de porciones
+    - detalle: notas o instrucciones especiales
+    """
+    class Meta:
+        model = DetalleOrden
+        fields = ['plato', 'cantidad', 'detalle']
+        widgets = {
+            'plato': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'detalle': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: Sin cebolla, extra queso, punto',
+                'rows': 3
+            }),
+        }
+        labels = {
+            'plato': 'Plato',
+            'cantidad': 'Cantidad',
+            'detalle': 'Instrucciones especiales',
+        }
+
+
 class OrdenForm(forms.ModelForm):
     """
     EXPLICACIÓN: Formulario para crear/editar órdenes.
@@ -350,28 +378,23 @@ class OrdenForm(forms.ModelForm):
     - empleado
     - mesa
     - estado_orden
-    - total
+
+    El total se calcula automáticamente a partir de los detalles de la orden.
     """
     class Meta:
         model = Orden
-        fields = ['cliente', 'empleado', 'mesa', 'estado_orden', 'total']
+        fields = ['cliente', 'empleado', 'mesa', 'estado_orden']
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-control'}),
             'empleado': forms.Select(attrs={'class': 'form-control'}),
             'mesa': forms.Select(attrs={'class': 'form-control'}),
             'estado_orden': forms.Select(attrs={'class': 'form-control'}),
-            'total': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Total de la orden',
-                'step': '0.01',
-            }),
         }
         labels = {
             'cliente': 'Cliente',
             'empleado': 'Empleado',
             'mesa': 'Mesa',
             'estado_orden': 'Estado de la Orden',
-            'total': 'Total',
         }
 
 

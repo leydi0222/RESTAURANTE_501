@@ -1,14 +1,26 @@
+from decimal import Decimal
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db import ProgrammingError
+from django.db import ProgrammingError, transaction
+from django.forms import inlineformset_factory
 
 # Importar modelos
-from .models import Cliente, Empleado, Mesa, Orden, Factura, Plato, Usuario, RolMenuPermiso
+from .models import Cliente, Empleado, Mesa, Orden, Factura, Plato, Usuario, RolMenuPermiso, DetalleOrden
 # Importar formularios
 from .forms import (
     LoginForm, RegistroForm, RolMenuPermisoForm, ClienteForm, EmpleadoForm,
-    MesaForm, PlatoForm, OrdenForm, FacturaForm
+    MesaForm, PlatoForm, DetalleOrdenForm, OrdenForm, FacturaForm
+)
+
+DetalleOrdenFormSet = inlineformset_factory(
+    Orden,
+    DetalleOrden,
+    form=DetalleOrdenForm,
+    extra=1,
+    can_delete=True,
+    min_num=1,
+    validate_min=True,
 )
 
 
@@ -557,7 +569,7 @@ def eliminar_plato(request, pk):
 @requiere_permiso('ordenes')
 def lista_ordenes(request):
     """Vista de órdenes - Solo para usuarios logueados"""
-    ordenes = Orden.objects.all()
+    ordenes = Orden.objects.select_related('cliente', 'empleado', 'mesa').prefetch_related('detalles')
     return render(request, 'gestion/ordenes.html', {'ordenes': ordenes})
 
 
@@ -567,13 +579,30 @@ def crear_orden(request):
     """Vista para crear una nueva orden."""
     if request.method == 'POST':
         form = OrdenForm(request.POST)
-        if form.is_valid():
-            form.save()
+        orden = Orden()
+        detalle_formset = DetalleOrdenFormSet(request.POST, instance=orden)
+
+        if form.is_valid() and detalle_formset.is_valid():
+            with transaction.atomic():
+                orden = form.save(commit=False)
+                orden.total = Decimal('0.00')
+                orden.save()
+                detalle_formset.instance = orden
+                detalle_formset.save()
+                orden.total = sum((detalle.subtotal or Decimal('0.00')) for detalle in orden.detalles.all())
+                orden.save()
+
             messages.success(request, "Orden creada correctamente.")
             return redirect('lista_ordenes')
     else:
         form = OrdenForm()
-    return render(request, 'gestion/orden_form.html', {'form': form, 'titulo': 'Crear Orden'})
+        detalle_formset = DetalleOrdenFormSet(instance=Orden())
+
+    return render(request, 'gestion/orden_form.html', {
+        'form': form,
+        'formset': detalle_formset,
+        'titulo': 'Crear Orden'
+    })
 
 
 @requiere_login
@@ -583,13 +612,27 @@ def editar_orden(request, pk):
     orden = get_object_or_404(Orden, pk=pk)
     if request.method == 'POST':
         form = OrdenForm(request.POST, instance=orden)
-        if form.is_valid():
-            form.save()
+        detalle_formset = DetalleOrdenFormSet(request.POST, instance=orden)
+
+        if form.is_valid() and detalle_formset.is_valid():
+            with transaction.atomic():
+                form.save()
+                detalle_formset.save()
+                orden.total = sum((detalle.subtotal or Decimal('0.00')) for detalle in orden.detalles.all())
+                orden.save()
+
             messages.success(request, "Orden actualizada correctamente.")
             return redirect('lista_ordenes')
     else:
         form = OrdenForm(instance=orden)
-    return render(request, 'gestion/orden_form.html', {'form': form, 'titulo': 'Editar Orden', 'orden': orden})
+        detalle_formset = DetalleOrdenFormSet(instance=orden)
+
+    return render(request, 'gestion/orden_form.html', {
+        'form': form,
+        'formset': detalle_formset,
+        'titulo': 'Editar Orden',
+        'orden': orden
+    })
 
 
 @requiere_login

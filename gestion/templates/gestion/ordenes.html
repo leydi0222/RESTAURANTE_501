@@ -22,6 +22,7 @@
                         <th><i class="fas fa-id-badge"></i> Empleado</th>
                         <th><i class="fas fa-table"></i> Mesa</th>
                         <th><i class="fas fa-calendar"></i> Fecha</th>
+                        <th><i class="fas fa-sticky-note"></i> Detalle</th>
                         <th><i class="fas fa-circle"></i> Estado</th>
                         <th><i class="fas fa-dollar-sign"></i> Total</th>
                         <th><i class="fas fa-cog"></i> Acciones</th>
@@ -37,6 +38,20 @@
                             <span class="badge bg-light text-dark">Mesa {{ orden.mesa.numero_mesa }}</span>
                         </td>
                         <td>{{ orden.fecha_hora|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if orden.detalles.exists %}
+                                <ul class="mb-0 ps-3">
+                                    {% for detalle in orden.detalles.all %}
+                                    <li>
+                                        <strong>{{ detalle.plato.nombre_plato }}</strong> x{{ detalle.cantidad }}
+                                        {% if detalle.detalle %}- {{ detalle.detalle }}{% endif %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span class="text-muted">Sin detalles</span>
+                            {% endif %}
+                        </td>
                         <td>
                             {% if orden.estado_orden == 'Activa' %}
                                 <span class="badge bg-warning">Activa</span>

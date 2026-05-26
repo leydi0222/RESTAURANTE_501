@@ -12,19 +12,83 @@
         <form method="post">
             {% csrf_token %}
 
-            {% for field in form %}
-            <div class="mb-3">
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.errors %}
-                <div class="text-danger">{{ field.errors }}</div>
-                {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% for field in form %}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
-            {% endfor %}
 
             {% if form.non_field_errors %}
             <div class="alert alert-danger">{{ form.non_field_errors }}</div>
             {% endif %}
+
+            <div class="mt-4">
+                <h4 class="mb-3">Detalles de la Orden</h4>
+
+                {% if formset.non_form_errors %}
+                <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+                {% endif %}
+
+                {{ formset.management_form }}
+
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead>
+                            <tr>
+                                <th>Plato</th>
+                                <th>Cantidad</th>
+                                <th>Instrucciones</th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle_form in formset.forms %}
+                            <tr>
+                                <td>
+                                    {{ detalle_form.plato }}
+                                    {% if detalle_form.plato.errors %}
+                                    <div class="text-danger">{{ detalle_form.plato.errors }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ detalle_form.cantidad }}
+                                    {% if detalle_form.cantidad.errors %}
+                                    <div class="text-danger">{{ detalle_form.cantidad.errors }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ detalle_form.detalle }}
+                                    {% if detalle_form.detalle.errors %}
+                                    <div class="text-danger">{{ detalle_form.detalle.errors }}</div>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center align-middle">
+                                    {% if detalle_form.DELETE %}
+                                    <div class="form-check">
+                                        {{ detalle_form.DELETE }}
+                                        <label class="form-check-label">Eliminar</label>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if detalle_form.non_field_errors %}
+                            <tr>
+                                <td colspan="4" class="text-danger">{{ detalle_form.non_field_errors }}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <button type="submit" class="btn btn-primary">Guardar</button>
             <a href="{% url 'lista_ordenes' %}" class="btn btn-secondary">Cancelar</a>

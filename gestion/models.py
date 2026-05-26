@@ -155,6 +155,7 @@ class DetalleOrden(models.Model):
     cantidad = models.PositiveIntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    detalle = models.TextField(blank=True, null=True, help_text='Notas o instrucciones especiales para este plato')
 
     class Meta:
         db_table = 'Detalle_Orden'
